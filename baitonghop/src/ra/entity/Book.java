@@ -312,9 +312,9 @@ public class Book implements IBook, Serializable {
             profit = this.profit +"";
         }
         System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
-        System.out.printf("Tên Sách: %55s\n", this.bookName);
-        System.out.printf("Mã ID: %-10s Giá nhập: %-15f Giá Bán: %-15f Lợi Nhuận: %-15s Sổ lượng còn lại: %-5d\n",this.bookId,this.importPrice,this.exportPrice,profit,this.quantity);
-        System.out.print("Danh sách tác giả: ");
+        System.out.printf("|   Tên Sách: %55s\n", this.bookName);
+        System.out.printf("|   Mã ID: %-10s Giá nhập: %-15f Giá Bán: %-15f Lợi Nhuận: %-15s Sổ lượng còn lại: %-5d\n",this.bookId,this.importPrice,this.exportPrice,profit,this.quantity);
+        System.out.print("|   Danh sách tác giả: ");
         try {
             for (Author author :listAuthor) {
                 System.out.printf(author.getAuthorName() + ",\t");
@@ -324,8 +324,8 @@ public class Book implements IBook, Serializable {
         }
 
         System.out.print("\n");
-        System.out.println("Tiêu đề sách: " + this.title);
-        System.out.printf("Nhà xuất bản: %-20s Trạng thái sách: %-30s\n", this.publishing,this.bookStatus);
+        System.out.println("|   Tiêu đề sách: " + this.title);
+        System.out.printf("|   Nhà xuất bản: %-20s Trạng thái sách: %-30s\n", this.publishing,this.bookStatus);
         System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
     }
 
@@ -340,6 +340,7 @@ public class Book implements IBook, Serializable {
             ois = new ObjectInputStream(fis);
             List<Book> bookList = (List<Book>) ois.readObject();
             listBook.addAll(bookList);
+//            listBook = (List<Book>) ois.readObject();
         } catch (IOException | ClassNotFoundException ex1) {
             ex1.printStackTrace();
         } finally {
@@ -402,5 +403,22 @@ public class Book implements IBook, Serializable {
                 System.err.println("Vui lòng nhập vào số !!!");
             }
         }while (true);
+    }
+    public void displayDataForUser (){
+        System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
+        System.out.printf("|   Tên Sách: %55s\n", this.bookName);
+        System.out.printf("|   Mã ID: %-10s  Giá Bán: %-15f  Sổ lượng còn lại: %-5d\n",this.bookId,this.exportPrice,this.quantity);
+        System.out.print("|   Danh sách tác giả: ");
+        try {
+            for (Author author :listAuthor) {
+                System.out.printf(author.getAuthorName() + ",\t");
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        System.out.print("\n");
+        System.out.println("|   Tiêu đề sách: " + this.title);
+        System.out.printf("|   Nhà xuất bản: %-20s Trạng thái sách: %-30s\n", this.publishing,this.bookStatus);
+        System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
     }
 }

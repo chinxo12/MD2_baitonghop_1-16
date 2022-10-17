@@ -1,26 +1,127 @@
 package ra.run;
 
-import com.sun.scenario.effect.impl.sw.java.JSWColorAdjustPeer;
 import ra.entity.Author;
 import ra.entity.Book;
+import ra.entity.User;
 
 import java.util.*;
 
 public class  BookManagement {
     static List <Author> listAuthor = new ArrayList<>();
     static List <Book> listBook = new ArrayList<>();
+    static List<User> userList = new ArrayList<>();
+    static String pathAuthor = "D:\\MD 2\\bai tong hop 1-16\\Author.txt";
+    static String pahtBooks = "D:\\MD 2\\bai tong hop 1-16\\books.txt";
+    static String pathUser = "D:\\MD 2\\bai tong hop 1-16\\User.txt";
+    static List<User> userLoginThisTime  = new ArrayList<>();
     public static void main(String[] args) {
-        Author author = new Author();
-        author.getData(listAuthor,listBook,"D:\\MD 2\\bai tong hop 1-16\\baitonghop\\Authors.txt");
-        Book book = new Book();
-        book.getData(listAuthor,listBook,"D:\\MD 2\\bai tong hop 1-16\\baitonghop\\Books.txt");
+//        User admin = new User("admin1","admin1",false);
+//        userList.add(admin);
+        User user1 = new User("chinxo26","123456",true);
+        userList.add(user1);
+        User user = new User();
+        user.getUserData(pathUser,userList);
         Scanner scanner = new Scanner(System.in);
 
         do {
-            System.out.println("********************QUẢN LÝ CỬA HÀNG SÁCH***************");
-            System.out.println("1. Quản lý tác giả");
-            System.out.println("2. Quản lý sách");
-            System.out.println("3. Thoát");
+            System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
+            System.out.println("|                           *************** TIỆM SÁCH BẤT ỔN **********************                                          |");
+            System.out.println("|  1. Đăng Nhập                                                                                                            |");
+            System.out.println("|  2. Đăng Ký                                                                                                              |");
+            System.out.println("|  3. Thoát                                                                                                                |");
+            System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
+            System.out.print("Lựa chọn của bạn: ");
+            int choice = 0;
+            System.out.print("\n");
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+            }catch (NumberFormatException ex1){
+                System.err.println("Vui lòng nhập vào số !!! ");
+            }
+            switch (choice) {
+                case 1:
+                    boolean checkLogin =  loginMenu(scanner);
+                   if (checkLogin){
+                       userMenu(scanner);
+                   }else {
+                       BookManagement.loginAdmin();
+                   }
+                    break;
+                case 2:
+                    register(scanner);
+                    break;
+                case 3:
+                    System.exit(0);
+                default:
+                    System.err.println("Vui lòng nhập 1 - 3 !!! ");
+            }
+        }while (true);
+    }
+    public static boolean loginMenu (Scanner scanner){
+        String userName = "";
+        String passWord = "";
+        boolean checkLogin = true;
+        do {
+            while (true){
+                System.out.println("Nhập vào tên Đăng nhập");
+                userName = scanner.nextLine();
+                if (userName.trim().length()>=6){
+                    break;
+                }else {
+                    System.err.println("Tên đăng nhập lớn hơn 6 ký tự !!! ");
+                }
+            }
+            while (true){
+                System.out.println("Nhập vào Mật khẩu: ");
+                passWord = scanner.nextLine();
+                if (passWord.trim().length()>=6){
+                    break;
+                }else {
+                    System.err.println("Password lớn hơn 6 ký tự !!! ");
+                }
+            }
+            boolean checkExit = false;
+            for (User user :userList) {
+                if (user.getUserName().equals(userName) && user.getPassword().equals(passWord)){
+                    checkExit = true;
+                    if (user.isCheckUser()){
+                        userLoginThisTime.add(user);
+                        break;
+                    }else {
+                        checkLogin = false;
+                        break;
+                    }
+                }
+            }
+            if (checkExit){
+                break;
+            }else {
+                System.err.println("Tên tài khoản hoặc mật khẩu không đúng !!!");
+            }
+        }while (true);
+        return checkLogin;
+    }
+    public static void register (Scanner scanner){
+        User user = new User();
+        user.register(scanner,userList);
+        userList.add(user);
+        user.writeUser(pathUser,userList);
+    }
+
+    public static void loginAdmin() {
+        Author author = new Author();
+        author.getData(listAuthor,listBook,pathAuthor);
+        Book book = new Book();
+        book.getData(listAuthor,listBook,pahtBooks);
+        Scanner scanner = new Scanner(System.in);
+        boolean checkExit = true;
+        do {
+            System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
+            System.out.println("|                           ******************** QUẢN LÝ CỬA HÀNG SÁCH ***************                                     |");
+            System.out.println("|  1. Quản lý tác giả                                                                                                      |");
+            System.out.println("|  2. Quản lý sách                                                                                                         |");
+            System.out.println("|  3. Thoát                                                                                                                |");
+            System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
             System.out.print("Lựa chọn của bạn: ");
             System.out.print("\n");
             String choice = scanner.nextLine();
@@ -33,23 +134,26 @@ public class  BookManagement {
                     break;
                 case "3":
                     scanner.close();
-                    System.exit(0);
+                   checkExit = false;
+                   break;
                 default:
                     System.err.println("Vui lòng nhập từ 1 -3 ");
             }
-        }while (true);
+        }while (checkExit);
     }
     public static void authorMenu (Scanner scanner){
         boolean exitMenu = true;
         Author author = new Author();
         Book book = new Book();
         do {
-            System.out.println("********************QUẢN LÝ TÁC GIẢ***********************");
-            System.out.println("1. Danh sách tác giả");
-            System.out.println("2. Thêm các tác giả");
-            System.out.println("3. Cập nhật thông tin tác giả");
-            System.out.println("4. Cập nhật trạng thái tác giả");
-            System.out.println("5. Thoát");
+            System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
+            System.out.println("|                    ******************** QUẢN LÝ TÁC GIẢ ***********************                                          |");
+            System.out.println("|  1. Danh sách tác giả                                                                                                    |");
+            System.out.println("|  2. Thêm các tác giả                                                                                                     |");
+            System.out.println("|  3. Cập nhật thông tin tác giả                                                                                           |");
+            System.out.println("|  4. Cập nhật trạng thái tác giả                                                                                          |");
+            System.out.println("|  5. Thoát                                                                                                                |");
+            System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
             System.out.print("Lựa chọn của bạn: ");
             System.out.print("\n");
             int choice = 0;
@@ -64,15 +168,15 @@ public class  BookManagement {
                     break;
                 case 2:
                     inputAuthors(scanner);
-                    author.insertData(listAuthor,listBook,"D:\\MD 2\\bai tong hop 1-16\\baitonghop\\Authors.txt");
+                    author.insertData(listAuthor,listBook,pathAuthor);
                     break;
                 case 3:
                     updateAuthorInformationById(scanner);
-                    author.insertData(listAuthor,listBook,"D:\\MD 2\\bai tong hop 1-16\\baitonghop\\Authors.txt");
+                    author.insertData(listAuthor,listBook,pathAuthor);
                     break;
                 case 4:
                     updateAuthorStatusByAuthorName(scanner);
-                    author.insertData(listAuthor,listBook,"D:\\MD 2\\bai tong hop 1-16\\baitonghop\\Authors.txt");
+                    author.insertData(listAuthor,listBook,pathAuthor);
                     break;
                 case 5:
                     exitMenu = false;
@@ -87,16 +191,18 @@ public class  BookManagement {
         Author author = new Author();
         Book book = new Book();
         do {
-            System.out.println("********************QUẢN LÝ SÁCH*************************");
-            System.out.println("1. Danh sách sách");
-            System.out.println("2. Thêm các sách");
-            System.out.println("3. Cập nhật thông tin sách");
-            System.out.println("4. Cập nhật trạng thái sách");
-            System.out.println("5. Tính lợi nhuận sách");
-            System.out.println("6. Sắp xếp sách theo giá bán tăng dần");
-            System.out.println("7. Tìm kiếm sách theo tên sách, tên tác giả");
-            System.out.println("8. Bán sách");
-            System.out.println("9. Thoát");
+            System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
+            System.out.println("|                            ******************** QUẢN LÝ SÁCH *************************                                   |");
+            System.out.println("|  1. Danh sách sách                                                                                                       |");
+            System.out.println("|  2. Thêm các sách                                                                                                        |");
+            System.out.println("|  3. Cập nhật thông tin sách                                                                                              |");
+            System.out.println("|  4. Cập nhật trạng thái sách                                                                                             |");
+            System.out.println("|  5. Tính lợi nhuận sách                                                                                                  |");
+            System.out.println("|  6. Sắp xếp sách theo giá bán tăng dần                                                                                   |");
+            System.out.println("|  7. Tìm kiếm sách theo tên sách, tên tác giả                                                                             |");
+            System.out.println("|  8. Bán sách                                                                                                             |");
+            System.out.println("|  9. Thoát                                                                                                                |");
+            System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
             System.out.print("Lựa chọn của bạn: ");
             System.out.print("\n");
             int choice = 0;
@@ -111,20 +217,20 @@ public class  BookManagement {
                     break;
                 case 2:
                     inputBooks(scanner);
-                    book.insertData(listAuthor,listBook,"BookChange");
-                    author.insertData(listAuthor,listBook,"D:\\MD 2\\bai tong hop 1-16\\baitonghop\\Authors.txt");
+                    book.insertData(listAuthor,listBook,pahtBooks);
+                    author.insertData(listAuthor,listBook,pathAuthor);
                     break;
                 case 3:
                     updateBookInformationById(scanner);
-                    book.insertData(listAuthor,listBook,"D:\\MD 2\\bai tong hop 1-16\\baitonghop\\Books.txt");
+                    book.insertData(listAuthor,listBook,pahtBooks);
                     break;
                 case 4:
                     updateBookStatusByBookName(scanner);
-                    book.insertData(listAuthor,listBook,"D:\\MD 2\\bai tong hop 1-16\\baitonghop\\Books.txt");
+                    book.insertData(listAuthor,listBook,pahtBooks);
                     break;
                 case 5:
                     calProfit();
-                    book.insertData(listAuthor,listBook,"D:\\MD 2\\bai tong hop 1-16\\baitonghop\\Books.txt");
+                    book.insertData(listAuthor,listBook,pahtBooks);
                     break;
                 case 6:
                     softByExportPrice();
@@ -134,7 +240,7 @@ public class  BookManagement {
                     break;
                 case 8:
                     saleBook(scanner);
-                    book.insertData(listAuthor,listBook,"D:\\MD 2\\bai tong hop 1-16\\baitonghop\\Books.txt");
+                    book.insertData(listAuthor,listBook,pahtBooks);
                     break;
                 case 9:
                     exitMenu = false;
@@ -143,6 +249,57 @@ public class  BookManagement {
                     System.err.println("Vui lòng nhập từ 1 - 9 !!!");
             }
         }while (exitMenu);
+    }
+    public static void userMenu (Scanner scanner){
+        boolean logIn = true;
+        do {
+            Author author = new Author();
+            author.getData(listAuthor,listBook,pathAuthor);
+            Book newBook = new Book();
+            newBook.getData(listAuthor,listBook,pahtBooks);
+            System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
+            System.out.println("|                           ******************* CỬA HÀNG SÁCH BẤT ỔN *****************                                     |");
+            System.out.println("|  1. Danh sách tác giả.                                                                                                   |");
+            System.out.println("|  2. Danh sách sách.                                                                                                      |");
+            System.out.println("|  3. Sắp xếp sách theo giá bán tăng dần.                                                                                  |");
+            System.out.println("|  4. Tìm kiếm sách theo tên sách, tên tác giả.                                                                            |");
+            System.out.println("|  5. Đổi mật khẩu.                                                                                                        |");
+            System.out.println("|  6. Đăng xuất                                                                                                            |");
+            System.out.println("*--------------------------------------------------------------------------------------------------------------------------*");
+            System.out.print("lựa chọn của bạn: ");
+            int choice = 0;
+            try{
+                choice = Integer.parseInt(scanner.nextLine());
+            }catch (NumberFormatException ex1){
+                System.err.println("Vui lòng nhập vào số !!!");
+            }
+            switch (choice){
+                case 1:
+                    displayAuthor();
+                    break;
+                case 2:
+                    for (Book book :listBook) {
+                        book.displayDataForUser();
+                    }
+                    break;
+                case 3:
+                    softByExportPrice();
+                    break;
+                case 4:
+                    searchBookByNameOrAuthorNameForUser(scanner);
+                    break;
+                case 5:
+                    changePassword(scanner);
+                    break;
+                case 6:
+                    userLoginThisTime.clear();
+                    logIn = false;
+                    break;
+                default:
+                    System.err.println("vui lòng nhập từ 1-6 !!!");
+
+            }
+        }while (logIn);
     }
     public static void displayAuthor () {
         System.out.printf("%-20s%-30s%-20s\n","Mã tác giả","Tên tác giả","Trạng thái");
@@ -424,6 +581,13 @@ public class  BookManagement {
                     break;
                 }else {
                     System.err.println("Không tìm thấy tên tác giả hay tên sách này !!! ");
+                    System.out.println("Bạn muốn thử tìm lại với tên khác không ?");
+                    System.out.println("1. Có");
+                    System.out.println("2. Bấm phím bất kỳ để thoát !");
+                    String choice = scanner.nextLine();
+                    if (!choice.equals("1")){
+                        break;
+                    }
                 }
             }else {
                 System.err.println("Không được để trống !!!");
@@ -431,9 +595,69 @@ public class  BookManagement {
         }while (true);
     }
     public static void saleBook (Scanner scanner){
-        for (Book book :listBook) {
-            book.saleBook(scanner);
-        }
-    }
+        do {
+            System.out.println("Nhập vào tên sách cần bán: ");
+            String bookName  = scanner.nextLine();
+            if (bookName.trim().length()!=0){
+                boolean checkExit = false;
+                for (Book book :listBook) {
+                    if (book.getBookName().toLowerCase().equals(bookName.toLowerCase())){
+                        book.saleBook(scanner);
+                        checkExit = true;
+                        break;
+                    }
+                }
+                if (checkExit){
+                    break;
+                }else {
+                    System.err.println("Không tìm thấy tên sách này trong danh sách !!!");
+                    System.out.println("Bạn muốn thử tìm lại với tên khác không ?");
+                    System.out.println("1. Có");
+                    System.out.println("2. Bấm phím bất kỳ để thoát !");
+                    String choice = scanner.nextLine();
+                    if (!choice.equals("1")){
+                        break;
+                    }
+                }
+            }else {
+                System.err.println("Vui lòng  không để trống !!!");
+            }
 
+        }while (true);
+    }
+    public static void searchBookByNameOrAuthorNameForUser (Scanner scanner){
+        do {
+            System.out.println("Nhập vào tên sách hoặc tên tác giả:  ");
+            String seachKey = scanner.nextLine();
+            if (seachKey.trim().length()!=0){
+                boolean checkExitSearch = false;
+                for (Book book :listBook) {
+                    for (Author author :book.getListAuthor()) {
+                        if (book.getBookName().trim().toLowerCase().contains(seachKey.toLowerCase()) ||
+                                author.getAuthorName().trim().toLowerCase().contains(seachKey.toLowerCase())){
+                            book.displayDataForUser();
+                            checkExitSearch = true;
+                        }
+                    }
+                }
+                if (checkExitSearch){
+                    break;
+                }else {
+                    System.err.println("Không tìm thấy tên tác giả hay tên sách này !!! ");
+                    System.out.println("Bạn muốn thử tìm lại với tên khác không ?");
+                    System.out.println("1. Có");
+                    System.out.println("2. Bấm phím bất kỳ để thoát !");
+                    String choice = scanner.nextLine();
+                    if (!choice.equals("1")){
+                        break;
+                    }
+                }
+            }else {
+                System.err.println("Không được để trống !!!");
+            }
+        }while (true);
+    }
+    public static void changePassword (Scanner scanner){
+        userLoginThisTime.get(0).setPassword(userLoginThisTime.get(0).inputPassword(scanner));
+    }
 }
