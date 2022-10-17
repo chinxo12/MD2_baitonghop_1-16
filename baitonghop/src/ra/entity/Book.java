@@ -136,7 +136,12 @@ public class Book implements IBook, Serializable {
             try {
                 System.out.println("Nhập vào giá nhập của Sách");
                 this.importPrice = Float.parseFloat(scanner.nextLine());
-                break;
+                if (this.importPrice>0){
+                    break;
+                }else {
+                    System.err.println("Trên đời chả có gì là miễn phí cả hãy nhập số tiền nhập vào lớn hơn 0 !!!");
+                }
+
             }catch (NumberFormatException e){
                 System.err.println("Vui lòng nhập vào số!");
             }
@@ -146,7 +151,12 @@ public class Book implements IBook, Serializable {
             try {
                 System.out.println("Nhập vào số lượng còn lại của sản phẩm !!!");
                 this.quantity = Integer.parseInt(scanner.nextLine());
-                break;
+                if (this.quantity>=0){
+                    break;
+                }else {
+                    System.err.println("Vui lòng nhập số lượng hơn hoặc bằng 0");
+                }
+
             }catch (NumberFormatException e){
                 System.err.println("Vui lòng nhập vào số !!!");
             }
@@ -391,11 +401,12 @@ public class Book implements IBook, Serializable {
                 System.out.println("Nhập vào số lượng sách bán đi: ");
                 int number = Integer.parseInt(scanner.nextLine());
                 if (number>this.quantity){
-                    this.quantity-=number;
-                    break;
-                }else if (number>0){
                     System.err.println("Số sách trong cửa hàng còn lại không đủ số lượng !!! ");
                     System.out.println("Số lượng còn lại: " +this.quantity);
+
+                }else if (number>0){
+                    this.quantity-=number;
+                    break;
                 }else {
                     System.err.println("Vui lòng nhập vào số lượng lớn hơn 0 !!!");;
                 }
